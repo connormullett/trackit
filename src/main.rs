@@ -10,22 +10,15 @@ mod connection;
 mod domains;
 pub mod schema;
 
+use domains::bug;
 use dotenv;
 
 fn main() {
     dotenv::dotenv().ok();
 
-    rocket::ignite()
-        .mount(
-            "/bugs",
-            routes![
-                domains::bug::get_all_bugs,
-                domains::bug::create_bug,
-                domains::bug::get_bug_by_id,
-                domains::bug::update_bug,
-                domains::bug::delete_bug
-            ],
-        )
-        .manage(connection::init_pool())
-        .launch();
+    let mut rocket = rocket::ignite().manage(connection::init_pool());
+
+    rocket = bug::mount(rocket);
+
+    rocket.launch();
 }
