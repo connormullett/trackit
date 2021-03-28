@@ -1,7 +1,8 @@
 use crate::schema::bug;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Queryable, AsChangeset)]
+#[table_name = "bug"]
 pub struct BugDto {
     pub id: i32,
     pub title: String,

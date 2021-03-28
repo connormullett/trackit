@@ -6,6 +6,7 @@ extern crate rocket;
 #[macro_use]
 extern crate diesel;
 
+mod connection;
 mod domains;
 pub mod schema;
 
@@ -19,5 +20,6 @@ fn main() {
             "/bugs",
             routes![domains::bug::get_all_bugs, domains::bug::create_bug],
         )
+        .manage(connection::init_pool())
         .launch();
 }

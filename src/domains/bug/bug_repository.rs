@@ -1,28 +1,17 @@
 #![allow(proc_macro_derive_resolution_fallback)]
 
-use diesel::RunQueryDsl;
+use diesel::prelude::*;
+use diesel::{QueryResult, RunQueryDsl};
 
 use super::{BugModel, NewBug};
-use crate::domains::estabilish_connection;
+use crate::schema::bug;
 
-pub fn get_all_bugs() -> Vec<BugModel> {
-    use crate::schema::bug::dsl::*;
-
-    let connection = estabilish_connection();
-    let bugs = bug
-        .load::<BugModel>(&connection)
-        .expect("error loading bugs");
-
-    bugs
+pub fn get_all_bugs(connection: &PgConnection) -> QueryResult<Vec<BugModel>> {
+    bug::table.load::<BugModel>(&*connection)
 }
 
-pub fn create_bug(bug: NewBug) -> BugModel {
-    use crate::schema::bug;
-
-    let connection = estabilish_connection();
-
+pub fn create_bug(new_bug: NewBug, connection: &PgConnection) -> QueryResult<BugModel> {
     diesel::insert_into(bug::table)
-        .values(&bug)
-        .get_result(&connection)
-        .expect("error saving new bug")
+        .values(&new_bug)
+        .get_result(&*connection)
 }
