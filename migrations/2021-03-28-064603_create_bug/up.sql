@@ -1,0 +1,6 @@
+CREATE TABLE bug (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(64) NOT NULL,
+  body TEXT NOT NULL,
+  resolved BOOLEAN NOT NULL DEFAULT 'f'
+)
