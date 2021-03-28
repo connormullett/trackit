@@ -11,11 +11,6 @@ pub mod schema;
 
 use dotenv;
 
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, Rocket"
-}
-
 fn main() {
     dotenv::dotenv().ok();
 
