@@ -10,15 +10,22 @@ use super::{BugDto, BugModel};
 pub fn get_all_bugs(conn: DbConn) -> Result<Vec<BugDto>, Status> {
     bug_repository::get_all_bugs(&conn)
         .map(|bugs| {
-            bugs.iter()
-                .map(|bug| BugDto {
-                    id: bug.id,
-                    title: bug.title.clone(),
-                    body: bug.body.clone(),
-                    resolved: bug.resolved,
-                })
+            bugs.into_iter()
+                .map(|bug| BugDto::from_model(bug))
                 .collect()
         })
+        .map_err(|error| error_status(error))
+}
+
+pub fn create_bug(bug: NewBug, conn: DbConn) -> Result<status::Created<Json<BugDto>>, Status> {
+    bug_repository::create_bug(bug, &conn)
+        .map(|bug| bug_created(bug))
+        .map_err(|error| error_status(error))
+}
+
+pub fn get_bug_by_id(id: i32, conn: DbConn) -> Result<BugDto, Status> {
+    bug_repository::get_bug_by_id(id, &conn)
+        .map(|bug| BugDto::from_model(bug))
         .map_err(|error| error_status(error))
 }
 
@@ -29,13 +36,7 @@ fn error_status(error: Error) -> Status {
     }
 }
 
-pub fn create_bug(bug: NewBug, conn: DbConn) -> Result<status::Created<Json<BugDto>>, Status> {
-    bug_repository::create_bug(bug, &conn)
-        .map(|person| person_created(person))
-        .map_err(|error| error_status(error))
-}
-
-fn person_created(bug: BugModel) -> status::Created<Json<BugDto>> {
+fn bug_created(bug: BugModel) -> status::Created<Json<BugDto>> {
     let host = dotenv::var("ROCKET_ADDRESS").expect("ROCKET_ADDRESS must be set");
     let port = dotenv::var("ROCKET_PORT").expect("ROCKET_PORT must be set");
     status::Created(
@@ -46,11 +47,6 @@ fn person_created(bug: BugModel) -> status::Created<Json<BugDto>> {
             id = bug.id
         )
         .to_string(),
-        Some(Json(BugDto {
-            id: bug.id,
-            title: bug.title,
-            body: bug.body,
-            resolved: bug.resolved,
-        })),
+        Some(Json(BugDto::from_model(bug))),
     )
 }

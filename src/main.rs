@@ -18,7 +18,11 @@ fn main() {
     rocket::ignite()
         .mount(
             "/bugs",
-            routes![domains::bug::get_all_bugs, domains::bug::create_bug],
+            routes![
+                domains::bug::get_all_bugs,
+                domains::bug::create_bug,
+                domains::bug::get_bug_by_id
+            ],
         )
         .manage(connection::init_pool())
         .launch();
