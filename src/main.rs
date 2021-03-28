@@ -20,6 +20,9 @@ fn main() {
     dotenv::dotenv().ok();
 
     rocket::ignite()
-        .mount("/bugs", routes![domains::bug::find_all_bugs])
+        .mount(
+            "/bugs",
+            routes![domains::bug::find_all_bugs, domains::bug::create_bug],
+        )
         .launch();
 }

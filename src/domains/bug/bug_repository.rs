@@ -2,7 +2,7 @@
 
 use diesel::RunQueryDsl;
 
-use super::BugModel;
+use super::{BugModel, NewBug};
 use crate::domains::estabilish_connection;
 
 pub fn find_all_bugs() -> Vec<BugModel> {
@@ -14,4 +14,15 @@ pub fn find_all_bugs() -> Vec<BugModel> {
         .expect("error loading bugs");
 
     bugs
+}
+
+pub fn create_bug(bug: NewBug) -> BugModel {
+    use crate::schema::bug;
+
+    let connection = estabilish_connection();
+
+    diesel::insert_into(bug::table)
+        .values(&bug)
+        .get_result(&connection)
+        .expect("error saving new bug")
 }

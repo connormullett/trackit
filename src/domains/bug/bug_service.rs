@@ -1,5 +1,5 @@
-use super::bug_repository;
 use super::BugDto;
+use super::{bug_repository, NewBug};
 
 pub fn find_all_bugs() -> Vec<BugDto> {
     bug_repository::find_all_bugs()
@@ -13,4 +13,15 @@ pub fn find_all_bugs() -> Vec<BugDto> {
             };
         })
         .collect()
+}
+
+pub fn create_bug(bug: NewBug) -> BugDto {
+    let e = bug_repository::create_bug(bug);
+
+    BugDto {
+        id: e.id,
+        title: e.title,
+        body: e.body,
+        resolved: e.resolved,
+    }
 }
