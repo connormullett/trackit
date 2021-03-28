@@ -13,5 +13,5 @@ pub fn get_all_bugs(connection: &PgConnection) -> QueryResult<Vec<BugModel>> {
 pub fn create_bug(new_bug: NewBug, connection: &PgConnection) -> QueryResult<BugModel> {
     diesel::insert_into(bug::table)
         .values(&new_bug)
-        .get_result(&*connection)
+        .get_result(connection)
 }
