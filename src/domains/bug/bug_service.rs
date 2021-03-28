@@ -1,8 +1,8 @@
 use super::BugDto;
 use super::{bug_repository, NewBug};
 
-pub fn find_all_bugs() -> Vec<BugDto> {
-    bug_repository::find_all_bugs()
+pub fn get_all_bugs() -> Vec<BugDto> {
+    bug_repository::get_all_bugs()
         .into_iter()
         .map(|bug| {
             return BugDto {

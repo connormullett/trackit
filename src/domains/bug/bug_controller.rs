@@ -2,8 +2,8 @@ use super::{bug_service, BugDto, NewBug};
 use rocket_contrib::json::Json;
 
 #[get("/")]
-pub fn find_all_bugs() -> Json<Vec<BugDto>> {
-    Json(bug_service::find_all_bugs())
+pub fn get_all_bugs() -> Json<Vec<BugDto>> {
+    Json(bug_service::get_all_bugs())
 }
 
 #[post("/", data = "<bug>")]

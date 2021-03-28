@@ -17,7 +17,7 @@ fn main() {
     rocket::ignite()
         .mount(
             "/bugs",
-            routes![domains::bug::find_all_bugs, domains::bug::create_bug],
+            routes![domains::bug::get_all_bugs, domains::bug::create_bug],
         )
         .launch();
 }

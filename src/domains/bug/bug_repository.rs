@@ -5,7 +5,7 @@ use diesel::RunQueryDsl;
 use super::{BugModel, NewBug};
 use crate::domains::estabilish_connection;
 
-pub fn find_all_bugs() -> Vec<BugModel> {
+pub fn get_all_bugs() -> Vec<BugModel> {
     use crate::schema::bug::dsl::*;
 
     let connection = estabilish_connection();
