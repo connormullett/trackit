@@ -29,6 +29,21 @@ pub fn get_bug_by_id(id: i32, conn: DbConn) -> Result<BugDto, Status> {
         .map_err(|error| error_status(error))
 }
 
+pub fn update_bug(id: i32, bug: BugDto, conn: DbConn) -> Result<BugDto, Status> {
+    bug_repository::update_bug(id, bug, &conn)
+        .map(|bug| BugDto::from_model(bug))
+        .map_err(|error| error_status(error))
+}
+
+pub fn delete_bug(id: i32, conn: DbConn) -> Result<status::NoContent, Status> {
+    match bug_repository::get_bug_by_id(id, &conn) {
+        Ok(_) => bug_repository::delete_bug(id, &conn)
+            .map(|_| status::NoContent)
+            .map_err(|error| error_status(error)),
+        Err(err) => Err(error_status(err)),
+    }
+}
+
 fn error_status(error: Error) -> Status {
     match error {
         Error::NotFound => Status::NotFound,

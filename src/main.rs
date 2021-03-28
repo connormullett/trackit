@@ -21,7 +21,9 @@ fn main() {
             routes![
                 domains::bug::get_all_bugs,
                 domains::bug::create_bug,
-                domains::bug::get_bug_by_id
+                domains::bug::get_bug_by_id,
+                domains::bug::update_bug,
+                domains::bug::delete_bug
             ],
         )
         .manage(connection::init_pool())

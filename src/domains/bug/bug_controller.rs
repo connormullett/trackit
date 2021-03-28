@@ -21,3 +21,13 @@ pub fn create_bug(
 ) -> Result<status::Created<Json<BugDto>>, Status> {
     bug_service::create_bug(bug.into_inner(), conn)
 }
+
+#[put("/<id>", data = "<bug>")]
+pub fn update_bug(id: i32, bug: Json<BugDto>, connection: DbConn) -> Result<Json<BugDto>, Status> {
+    bug_service::update_bug(id, bug.into_inner(), connection).map(|bug| Json(bug))
+}
+
+#[delete("/<id>")]
+pub fn delete_bug(id: i32, connection: DbConn) -> Result<status::NoContent, Status> {
+    bug_service::delete_bug(id, connection)
+}

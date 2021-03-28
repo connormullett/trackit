@@ -3,7 +3,7 @@
 use diesel::prelude::*;
 use diesel::{QueryResult, RunQueryDsl};
 
-use super::{BugModel, NewBug};
+use super::{BugDto, BugModel, NewBug};
 use crate::schema::bug;
 
 pub fn get_all_bugs(connection: &PgConnection) -> QueryResult<Vec<BugModel>> {
@@ -18,4 +18,14 @@ pub fn create_bug(new_bug: NewBug, connection: &PgConnection) -> QueryResult<Bug
     diesel::insert_into(bug::table)
         .values(&new_bug)
         .get_result(connection)
+}
+
+pub fn update_bug(id: i32, bug: BugDto, connection: &PgConnection) -> QueryResult<BugModel> {
+    diesel::update(bug::table.find(id))
+        .set(&bug)
+        .get_result(connection)
+}
+
+pub fn delete_bug(id: i32, connection: &PgConnection) -> QueryResult<usize> {
+    diesel::delete(bug::table.find(id)).execute(connection)
 }
