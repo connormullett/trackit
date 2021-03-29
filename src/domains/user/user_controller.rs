@@ -3,12 +3,12 @@ use rocket_contrib::json::Json;
 
 use crate::connection::DbConn;
 
-use super::{user_service, NewUser};
+use super::{user_service, AuthResponse, UserDto};
 
 #[post("/", data = "<user>")]
 pub fn register(
-    user: Json<NewUser>,
+    user: Json<UserDto>,
     connection: DbConn,
-) -> Result<status::Created<Json<String>>, Status> {
+) -> Result<status::Created<Json<AuthResponse>>, Status> {
     user_service::create_user(user.into_inner(), connection)
 }

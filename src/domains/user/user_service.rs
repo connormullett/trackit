@@ -1,13 +1,14 @@
 use crypto::sha2::Sha256;
 use diesel::result::Error;
 use jwt::{Header, Registered, Token};
+use pwhash::bcrypt;
 use rocket::{http::Status, response::status};
 use rocket_contrib::json::Json;
 use serde::Deserialize;
 
 use crate::connection::DbConn;
 
-use super::{user_repository, NewUser, UserModel};
+use super::{user_repository, AuthResponse, UserDto, UserInsert, UserModel};
 
 #[derive(Deserialize)]
 pub struct Credentials {
@@ -15,12 +16,23 @@ pub struct Credentials {
     pub password: String,
 }
 
-pub fn create_user(user: NewUser, conn: DbConn) -> Result<status::Created<Json<String>>, Status> {
+pub fn create_user(
+    new_user: UserDto,
+    conn: DbConn,
+) -> Result<status::Created<Json<AuthResponse>>, Status> {
+    let user = UserInsert {
+        username: new_user.username,
+        password_hash: bcrypt::hash(new_user.password).unwrap(),
+    };
+
     let user = user_repository::create_user(user, &conn);
 
     match user {
         Ok(user) => user_created(user, conn),
-        Err(error) => Err(error_status(error)),
+        Err(error) => {
+            println!("error {}", error);
+            Err(error_status(error))
+        }
     }
 }
 
@@ -56,7 +68,10 @@ fn issue_auth_token(credentials: Credentials, conn: DbConn) -> Result<String, St
     }
 }
 
-fn user_created(user: UserModel, conn: DbConn) -> Result<status::Created<Json<String>>, Status> {
+fn user_created(
+    user: UserModel,
+    conn: DbConn,
+) -> Result<status::Created<Json<AuthResponse>>, Status> {
     match issue_auth_token(
         Credentials {
             username: user.username,
@@ -66,7 +81,7 @@ fn user_created(user: UserModel, conn: DbConn) -> Result<status::Created<Json<St
     ) {
         Ok(token) => Ok(status::Created(
             format!("/users/{}", user.id),
-            Some(Json(token)),
+            Some(Json(AuthResponse { token })),
         )),
         Err(_) => Err(Status::NotFound),
     }

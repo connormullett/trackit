@@ -1,5 +1,4 @@
 use crate::schema::app_user;
-use serde::Deserialize;
 
 #[derive(Queryable, AsChangeset)]
 #[table_name = "app_user"]
@@ -9,9 +8,9 @@ pub struct UserModel {
     pub password_hash: String,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable)]
 #[table_name = "app_user"]
-pub struct NewUser {
+pub struct UserInsert {
     pub username: String,
     pub password_hash: String,
 }
