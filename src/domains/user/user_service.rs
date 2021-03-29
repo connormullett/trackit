@@ -4,17 +4,10 @@ use jwt::{Header, Registered, Token};
 use pwhash::bcrypt;
 use rocket::{http::Status, response::status};
 use rocket_contrib::json::Json;
-use serde::Deserialize;
 
 use crate::connection::DbConn;
 
 use super::{user_repository, AuthResponse, UserDto, UserInsert, UserModel};
-
-#[derive(Deserialize)]
-pub struct Credentials {
-    pub username: String,
-    pub password: String,
-}
 
 pub fn create_user(
     new_user: UserDto,
@@ -43,7 +36,7 @@ fn error_status(error: Error) -> Status {
     }
 }
 
-fn issue_auth_token(credentials: Credentials, conn: DbConn) -> Result<String, Status> {
+fn issue_auth_token(credentials: UserDto, conn: DbConn) -> Result<String, Status> {
     let header: Header = Default::default();
 
     match user_repository::authenticate_user(credentials, &conn) {
@@ -73,7 +66,7 @@ fn user_created(
     conn: DbConn,
 ) -> Result<status::Created<Json<AuthResponse>>, Status> {
     match issue_auth_token(
-        Credentials {
+        UserDto {
             username: user.username,
             password: user.password_hash,
         },

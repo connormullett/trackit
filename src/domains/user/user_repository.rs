@@ -3,7 +3,7 @@ use diesel::{QueryResult, RunQueryDsl};
 
 use crate::schema::app_user;
 
-use super::{Credentials, UserInsert, UserModel};
+use super::{UserDto, UserInsert, UserModel};
 
 pub fn create_user(user: UserInsert, connection: &PgConnection) -> QueryResult<UserModel> {
     diesel::insert_into(app_user::table)
@@ -11,7 +11,7 @@ pub fn create_user(user: UserInsert, connection: &PgConnection) -> QueryResult<U
         .get_result(connection)
 }
 
-pub fn authenticate_user(credentials: Credentials, connection: &PgConnection) -> Option<UserModel> {
+pub fn authenticate_user(credentials: UserDto, connection: &PgConnection) -> Option<UserModel> {
     println!("authenticate_user password {}", credentials.password);
     app_user::table
         .filter(app_user::username.eq(credentials.username))
