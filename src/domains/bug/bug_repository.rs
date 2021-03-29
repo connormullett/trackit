@@ -1,5 +1,3 @@
-#![allow(proc_macro_derive_resolution_fallback)]
-
 use diesel::prelude::*;
 use diesel::{QueryResult, RunQueryDsl};
 

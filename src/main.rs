@@ -11,6 +11,7 @@ mod domains;
 pub mod schema;
 
 use domains::bug;
+use domains::user;
 use dotenv;
 
 fn main() {
@@ -19,6 +20,7 @@ fn main() {
     let mut rocket = rocket::ignite().manage(connection::init_pool());
 
     rocket = bug::mount(rocket);
+    rocket = user::mount(rocket);
 
     rocket.launch();
 }
