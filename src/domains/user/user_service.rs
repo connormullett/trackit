@@ -1,5 +1,5 @@
 use crypto::sha2::Sha256;
-use diesel::result::Error;
+use diesel::result::{DatabaseErrorKind, Error};
 use jwt::{Header, Registered, Token};
 use pwhash::bcrypt;
 use rocket::{http::Status, response::status};
@@ -29,6 +29,10 @@ pub fn create_user(
 fn error_status(error: Error) -> Status {
     match error {
         Error::NotFound => Status::NotFound,
+        Error::DatabaseError(kind, _) => match kind {
+            DatabaseErrorKind::UniqueViolation => Status::Conflict,
+            _ => Status::InternalServerError,
+        },
         _ => Status::InternalServerError,
     }
 }
