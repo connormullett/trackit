@@ -22,10 +22,7 @@ pub fn create_user(
 
     match user {
         Ok(user) => user_created(user, conn),
-        Err(error) => {
-            println!("error {}", error);
-            Err(error_status(error))
-        }
+        Err(error) => Err(error_status(error)),
     }
 }
 

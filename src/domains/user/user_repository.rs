@@ -12,7 +12,6 @@ pub fn create_user(user: UserInsert, connection: &PgConnection) -> QueryResult<U
 }
 
 pub fn authenticate_user(credentials: UserDto, connection: &PgConnection) -> Option<UserModel> {
-    println!("authenticate_user password {}", credentials.password);
     app_user::table
         .filter(app_user::username.eq(credentials.username))
         .filter(app_user::password_hash.eq(credentials.password))
