@@ -13,5 +13,8 @@ pub use self::user_repository::*;
 pub use self::user_service::*;
 
 pub fn mount(rocket: Rocket) -> Rocket {
-    rocket.mount("/users", routes![user_controller::register])
+    rocket.mount(
+        "/users",
+        routes![user_controller::register, user_controller::get_me],
+    )
 }

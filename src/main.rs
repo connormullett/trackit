@@ -10,8 +10,7 @@ mod connection;
 mod domains;
 pub mod schema;
 
-use domains::bug;
-use domains::user;
+use domains::{auth, bug, user};
 use dotenv;
 
 fn main() {
@@ -21,6 +20,7 @@ fn main() {
 
     rocket = bug::mount(rocket);
     rocket = user::mount(rocket);
+    rocket = auth::mount(rocket);
 
     rocket.launch();
 }

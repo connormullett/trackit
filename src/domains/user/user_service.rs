@@ -4,7 +4,7 @@ use rocket::{http::Status, response::status};
 use rocket_contrib::json::Json;
 
 use crate::connection::DbConn;
-use crate::domains::auth::auth;
+use crate::domains::auth::auth_service;
 use crate::domains::helpers;
 
 use super::{user_repository, AuthResponse, UserDto, UserInsert, UserModel};
@@ -30,7 +30,7 @@ fn user_created(
     user: UserModel,
     conn: DbConn,
 ) -> Result<status::Created<Json<AuthResponse>>, Status> {
-    match auth::issue_auth_token(
+    match auth_service::issue_auth_token(
         UserDto {
             username: user.username,
             password: user.password_hash,

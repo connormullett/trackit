@@ -1,3 +1,13 @@
-pub mod auth;
+pub mod auth_controller;
+pub mod auth_service;
+pub mod dto;
 
-pub use self::auth::*;
+use rocket::Rocket;
+
+pub use self::auth_controller::*;
+pub use self::auth_service::*;
+pub use self::dto::*;
+
+pub fn mount(rocket: Rocket) -> Rocket {
+    rocket.mount("/auth", routes![auth_controller::login])
+}

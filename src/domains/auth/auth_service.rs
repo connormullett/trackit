@@ -1,3 +1,4 @@
+use chrono::Utc;
 use rocket::Outcome;
 use rocket::{
     http::Status,
@@ -47,11 +48,17 @@ pub fn validate_token(key: &str) -> Result<String, String> {
 pub fn issue_auth_token(credentials: UserDto, conn: DbConn) -> Result<String, Status> {
     let header: Header = Default::default();
 
+    let expiration = Utc::now()
+        .checked_add_signed(chrono::Duration::seconds(60))
+        .expect("valid timestamp")
+        .timestamp();
+
     match user_repository::authenticate_user(credentials, &conn) {
         None => Err(Status::NotFound),
         Some(user) => {
             let claims = Registered {
-                sub: Some(user.username.into()),
+                sub: Some(user.id.to_string()),
+                exp: Some(expiration as u64),
                 ..Default::default()
             };
             let token = Token::new(header, claims);
