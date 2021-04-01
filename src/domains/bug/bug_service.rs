@@ -1,7 +1,6 @@
-use diesel::result::Error;
 use rocket_contrib::json::Json;
 
-use crate::connection::DbConn;
+use crate::{connection::DbConn, domains::error_status};
 use rocket::{http::Status, response::status};
 
 use super::{bug_repository, NewBug};
@@ -41,13 +40,6 @@ pub fn delete_bug(id: i32, conn: DbConn) -> Result<status::NoContent, Status> {
             .map(|_| status::NoContent)
             .map_err(|error| error_status(error)),
         Err(err) => Err(error_status(err)),
-    }
-}
-
-fn error_status(error: Error) -> Status {
-    match error {
-        Error::NotFound => Status::NotFound,
-        _ => Status::InternalServerError,
     }
 }
 

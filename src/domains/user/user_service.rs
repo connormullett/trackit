@@ -1,11 +1,11 @@
-use crypto::sha2::Sha256;
-use diesel::result::{DatabaseErrorKind, Error};
-use jwt::{Header, Registered, Token};
+use helpers::error_status;
 use pwhash::bcrypt;
 use rocket::{http::Status, response::status};
 use rocket_contrib::json::Json;
 
 use crate::connection::DbConn;
+use crate::domains::auth::auth;
+use crate::domains::helpers;
 
 use super::{user_repository, AuthResponse, UserDto, UserInsert, UserModel};
 
@@ -26,47 +26,11 @@ pub fn create_user(
     }
 }
 
-fn error_status(error: Error) -> Status {
-    match error {
-        Error::NotFound => Status::NotFound,
-        Error::DatabaseError(kind, _) => match kind {
-            DatabaseErrorKind::UniqueViolation => Status::Conflict,
-            _ => Status::InternalServerError,
-        },
-        _ => Status::InternalServerError,
-    }
-}
-
-fn issue_auth_token(credentials: UserDto, conn: DbConn) -> Result<String, Status> {
-    let header: Header = Default::default();
-
-    match user_repository::authenticate_user(credentials, &conn) {
-        None => Err(Status::NotFound),
-        Some(user) => {
-            let claims = Registered {
-                sub: Some(user.username.into()),
-                ..Default::default()
-            };
-            let token = Token::new(header, claims);
-
-            token
-                .signed(
-                    dotenv::var("JWT_SIGNING_KEY")
-                        .expect("JWT_SIGNING_KEY is required")
-                        .as_bytes(),
-                    Sha256::new(),
-                )
-                .map(|message| message)
-                .map_err(|_| Status::InternalServerError)
-        }
-    }
-}
-
 fn user_created(
     user: UserModel,
     conn: DbConn,
 ) -> Result<status::Created<Json<AuthResponse>>, Status> {
-    match issue_auth_token(
+    match auth::issue_auth_token(
         UserDto {
             username: user.username,
             password: user.password_hash,
