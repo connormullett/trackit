@@ -1,4 +1,4 @@
-use crate::connection::DbConn;
+use crate::{connection::DbConn, domains::ApiKey};
 
 use super::{bug_service, BugDto, NewBug};
 use rocket::{http::Status, response::status};
@@ -16,6 +16,7 @@ pub fn get_bug_by_id(id: i32, connection: DbConn) -> Result<Json<BugDto>, Status
 
 #[post("/", data = "<bug>")]
 pub fn create_bug(
+    _api_key: ApiKey,
     bug: Json<NewBug>,
     conn: DbConn,
 ) -> Result<status::Created<Json<BugDto>>, Status> {
