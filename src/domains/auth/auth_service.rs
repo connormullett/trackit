@@ -23,7 +23,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for ApiKey {
     type Error = ();
 
     fn from_request(request: &'a Request<'r>) -> request::Outcome<ApiKey, ()> {
-        let keys: Vec<_> = request.headers().get("Authentication").collect();
+        let keys: Vec<_> = request.headers().get("Authorization").collect();
         if keys.len() != 1 {
             return Outcome::Failure((Status::BadRequest, ()));
         }
@@ -38,6 +38,7 @@ pub fn validate_token(key: &str) -> Result<String, String> {
     let secret_key = dotenv::var("JWT_SIGNING_KEY").expect("JWT_SIGNING_KEY is required");
     let token =
         Token::<Header, Registered>::parse(key).map_err(|_| "Unable to parse key".to_string())?;
+    println!("token {:?}", token.claims.sub);
     if token.verify(secret_key.as_bytes(), Sha256::new()) {
         token.claims.sub.ok_or("Claims are invalid".to_string())
     } else {
